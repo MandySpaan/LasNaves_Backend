@@ -1,6 +1,7 @@
 import express from "express";
 import "dotenv/config";
 import { dbConnection } from "./database/db";
+import { router } from "./router";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,6 +14,8 @@ app.get("/healthy", (req, res) => {
     message: "Server is healthy",
   });
 });
+
+app.use("/", router);
 
 dbConnection()
   .then(() => {

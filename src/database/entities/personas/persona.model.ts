@@ -1,6 +1,15 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const personaSchema = new mongoose.Schema(
+interface IPersona extends Document {
+  nombre: string;
+  apellidos: string;
+  startUp?: string;
+  correoElectronico: string;
+  dni: string;
+  telefono?: string;
+}
+
+const personaSchema: Schema = new Schema(
   {
     nombre: { type: String, required: true },
     apellidos: { type: String, required: true },
@@ -14,6 +23,6 @@ const personaSchema = new mongoose.Schema(
   }
 );
 
-const Persona = mongoose.model("Persona", personaSchema);
+const Persona = mongoose.model<IPersona>("Persona", personaSchema);
 
 export default Persona;

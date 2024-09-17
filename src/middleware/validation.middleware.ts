@@ -1,4 +1,5 @@
-import { body } from "express-validator";
+import { Request, Response, NextFunction } from "express";
+import { body, validationResult } from "express-validator";
 
 export const validateRegister = [
   body("name").notEmpty().withMessage("Name is required"),
@@ -17,4 +18,17 @@ export const validateRegister = [
       }
       return true;
     }),
+];
+
+export const validateLogin = [
+  body("email").isEmail().withMessage("Please provide a valid email"),
+  body("password").not().isEmpty().withMessage("Password cannot be empty"),
+
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
 ];

@@ -8,8 +8,13 @@ export const validateRegister = [
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
-  body("role")
-    .optional()
-    .isIn(["user", "admin", "superAdmin"])
-    .withMessage("Invalid role"),
+  body("confirmPassword")
+    .notEmpty()
+    .withMessage("Confirm Password is required")
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error("Passwords do not match");
+      }
+      return true;
+    }),
 ];

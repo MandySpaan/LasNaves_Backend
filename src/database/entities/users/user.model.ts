@@ -11,6 +11,8 @@ interface IUser extends Document {
   password: string;
   role: "user" | "admin" | "superAdmin";
   isActive: boolean;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
 }
 
 const userSchema: Schema = new Schema(
@@ -22,6 +24,8 @@ const userSchema: Schema = new Schema(
     dni: { type: String, required: true, unique: true },
     phone: { type: String },
     password: { type: String, required: true },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
     role: {
       type: String,
       enum: ["user", "admin", "superAdmin"],

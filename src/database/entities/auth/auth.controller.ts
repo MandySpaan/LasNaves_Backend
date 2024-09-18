@@ -52,6 +52,39 @@ class AuthController {
       return res.status(500).json({ message: "Server error" });
     }
   }
+
+  async requestPasswordReset(req: Request, res: Response) {
+    const { email } = req.body;
+
+    try {
+      const resetToken = await AuthService.generatePasswordResetToken(email);
+      if (!resetToken) {
+        return res.status(400).json({ message: "User not found" });
+      }
+
+      // ToDo: This has to be changed to send the resetToken via email in real implementation.
+      return res.status(200).json({ message: "Password reset email sent" });
+    } catch (error) {
+      return res.status(500).json({ message: "Server error" });
+    }
+  }
+
+  async resetPassword(req: Request, res: Response) {
+    const { token, newPassword } = req.body;
+
+    try {
+      const isResetSuccessful = await AuthService.resetPassword(
+        token,
+        newPassword
+      );
+      if (!isResetSuccessful) {
+        return res.status(400).json({ message: "Invalid or expired token" });
+      }
+      return res.status(200).json({ message: "Password reset successful" });
+    } catch (error) {
+      return res.status(500).json({ message: "Server error" });
+    }
+  }
 }
 
 export default new AuthController();

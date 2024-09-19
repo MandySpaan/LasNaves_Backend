@@ -33,6 +33,7 @@ class AuthService {
     }
 
     const verificationToken = crypto.randomBytes(32).toString("hex");
+    const hashedVerificationToken = await bcrypt.hash(verificationToken, 10);
     const verificationTokenExpires = new Date(Date.now() + 3600000);
 
     const newUser = new User({
@@ -43,7 +44,7 @@ class AuthService {
       dni,
       phone,
       password,
-      verificationToken,
+      verificationToken: hashedVerificationToken,
       verificationTokenExpires,
       isVerified: false,
     });
@@ -68,9 +69,13 @@ class AuthService {
     }
 
     const newVerificationToken = crypto.randomBytes(32).toString("hex");
+    const hashedNewVerificationToken = await bcrypt.hash(
+      newVerificationToken,
+      10
+    );
     const newVerificationTokenExpires = new Date(Date.now() + 3600000);
 
-    user.verificationToken = newVerificationToken;
+    user.verificationToken = hashedNewVerificationToken;
     user.verificationTokenExpires = newVerificationTokenExpires;
 
     await user.save();
@@ -78,14 +83,19 @@ class AuthService {
     await sendVerificationEmail(email, newVerificationToken);
   }
 
-  async verifyEmail(token: string): Promise<boolean> {
+  async verifyEmail(email: string, token: string): Promise<boolean> {
     const user = await User.findOne({
-      verificationToken: token,
+      email,
       verificationTokenExpires: { $gt: Date.now() },
     });
 
     if (!user) {
       throw new Error("Invalid or expired token.");
+    }
+
+    const isTokenValid = await bcrypt.compare(token, user.verificationToken!);
+    if (!isTokenValid) {
+      throw new Error("Invalid token.");
     }
 
     user.isVerified = true;
@@ -132,8 +142,13 @@ class AuthService {
     return resetToken;
   }
 
-  async resetPassword(token: string, newPassword: string): Promise<boolean> {
+  async resetPassword(
+    email: string,
+    token: string,
+    newPassword: string
+  ): Promise<boolean> {
     const user = await User.findOne({
+      email,
       resetPasswordToken: { $exists: true },
       resetPasswordExpires: { $gt: Date.now() },
     });

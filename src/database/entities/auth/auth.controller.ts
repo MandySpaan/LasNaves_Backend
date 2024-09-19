@@ -20,8 +20,9 @@ class AuthController {
   }
 
   async verifyEmail(req: Request, res: Response) {
-    const { token } = req.query as { token: string };
-    const result = await AuthService.verifyEmail(token);
+    const { token, email } = req.query as { token: string; email: string };
+    const decodedEmail = decodeURIComponent(email);
+    const result = await AuthService.verifyEmail(decodedEmail, token);
     res
       .status(200)
       .json({ message: "Email verified successfully. You can now log in." });
@@ -49,13 +50,15 @@ class AuthController {
       return res.status(400).json({ message: "User not found" });
     }
 
-    // ToDo: This has to be changed to send the resetToken via email in real implementation.
     res.status(200).json({ message: "Password reset email sent" });
   }
 
   async resetPassword(req: Request, res: Response) {
-    const { token, newPassword } = req.body;
+    const { token, email } = req.query as { token: string; email: string };
+    const { newPassword } = req.body;
+    const decodedEmail = decodeURIComponent(email);
     const isResetSuccessful = await AuthService.resetPassword(
+      decodedEmail,
       token,
       newPassword
     );

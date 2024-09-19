@@ -11,7 +11,9 @@ const transporter = nodemailer.createTransport({
 
 export async function sendVerificationEmail(email: string, token: string) {
   //ToDo: Change this to the real domain that is being used
-  const verificationUrl = `http://localhost:4000/auth/verify-email?token=${token}`;
+  const verificationUrl = `http://localhost:4000/auth/verify-email?token=${token}&email=${encodeURIComponent(
+    email
+  )};`;
 
   const mailOptions = {
     from: "lasnavesgeekshubs@gmail.com", //ToDo: Change this to desired email
@@ -25,7 +27,9 @@ export async function sendVerificationEmail(email: string, token: string) {
 
 export async function sendPasswordResetEmail(email: string, token: string) {
   // ToDo: Change this to the real domain that is being used
-  const resetUrl = `http://localhost:4000/auth/reset-password?token=${token}`;
+  const resetUrl = `http://localhost:4000/auth/reset-password?token=${token}&email=${encodeURIComponent(
+    email
+  )};`;
 
   const mailOptions = {
     from: "lasnavesgeekshubs@gmail.com", // ToDo: Change this to the desired email

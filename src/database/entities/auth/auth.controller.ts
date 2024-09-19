@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { validationResult } from "express-validator";
 import AuthService from "./auth.service";
 
 class AuthController {
@@ -8,9 +7,18 @@ class AuthController {
     const userWithoutPassword = await AuthService.registerUser(userInput);
 
     res.status(201).json({
-      message: "User registered successfully",
+      message:
+        "Registration successful. Please check your email for verification.",
       user: userWithoutPassword,
     });
+  }
+
+  async verifyEmail(req: Request, res: Response) {
+    const { token } = req.query as { token: string };
+    const result = await AuthService.verifyEmail(token);
+    res
+      .status(200)
+      .json({ message: "Email verified successfully. You can now log in." });
   }
 
   async login(req: Request, res: Response) {

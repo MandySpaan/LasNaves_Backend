@@ -13,6 +13,9 @@ interface IUser extends Document {
   isActive: boolean;
   resetPasswordToken?: string;
   resetPasswordExpires?: Date;
+  verificationToken?: string;
+  verificationTokenExpires?: Date;
+  isVerified: boolean;
 }
 
 const userSchema: Schema = new Schema(
@@ -31,6 +34,9 @@ const userSchema: Schema = new Schema(
       enum: ["user", "admin", "superAdmin"],
       default: "user",
     },
+    verificationToken: String,
+    verificationTokenExpires: Date,
+    isVerified: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
   },
   {

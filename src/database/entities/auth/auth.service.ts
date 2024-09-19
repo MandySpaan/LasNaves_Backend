@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../users/user.model";
 import crypto from "crypto";
+import { sendVerificationEmail } from "../email/email.service";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 // The "your_jwt_secret" can be set as a fallback value in case the .env is not set
@@ -12,8 +13,11 @@ interface RegisterUserInput {
   startUp: string;
   email: string;
   dni: string;
-  phone: string;
+  phone?: string;
   password: string;
+  verificationToken?: string;
+  verificationTokenExpires?: Date;
+  isVerified?: boolean;
 }
 
 class AuthService {
@@ -25,6 +29,9 @@ class AuthService {
       throw new Error("User with this email or DNI already exists.");
     }
 
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const verificationTokenExpires = new Date(Date.now() + 3600000);
+
     const newUser = new User({
       name,
       surname,
@@ -33,12 +40,35 @@ class AuthService {
       dni,
       phone,
       password,
+      verificationToken,
+      verificationTokenExpires,
+      isVerified: false,
     });
 
     const savedUser = await newUser.save();
 
+    await sendVerificationEmail(email, verificationToken);
+
     const { password: _, ...userWithoutPassword } = savedUser.toObject();
     return userWithoutPassword;
+  }
+
+  async verifyEmail(token: string): Promise<boolean> {
+    const user = await User.findOne({
+      verificationToken: token,
+      verificationTokenExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      throw new Error("Invalid or expired token.");
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpires = undefined;
+
+    await user.save();
+    return true;
   }
 
   async loginUser(email: string, password: string): Promise<string | null> {

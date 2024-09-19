@@ -10,6 +10,11 @@ router.post(
   Validator.handleValidationResult,
   AuthController.register
 );
+router.get(
+  "/verify-email",
+  Validator.handleValidationResult,
+  AuthController.verifyEmail
+);
 router.post(
   "/login",
   Validator.login(),

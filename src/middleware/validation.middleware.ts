@@ -1,59 +1,58 @@
 import { Request, Response, NextFunction } from "express";
 import { body, validationResult } from "express-validator";
 
-export const validateRegister = [
-  body("name").notEmpty().withMessage("Name is required"),
-  body("surname").notEmpty().withMessage("Surname is required"),
-  body("email").isEmail().withMessage("Invalid email address"),
-  body("dni").notEmpty().withMessage("DNI is required"),
-  body("password")
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long"),
-  body("confirmPassword")
-    .notEmpty()
-    .withMessage("Confirm Password is required")
-    .custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error("Passwords do not match");
-      }
-      return true;
-    }),
-];
+class Validator {
+  static register() {
+    return [
+      body("name").notEmpty().withMessage("Name is required"),
+      body("surname").notEmpty().withMessage("Surname is required"),
+      body("email").isEmail().withMessage("Invalid email address"),
+      body("dni").notEmpty().withMessage("DNI is required"),
+      body("password")
+        .isLength({ min: 6 })
+        .withMessage("Password must be at least 6 characters long"),
+      body("confirmPassword")
+        .notEmpty()
+        .withMessage("Confirm Password is required")
+        .custom((value, { req }) => {
+          if (value !== req.body.password) {
+            throw new Error("Passwords do not match");
+          }
+          return true;
+        }),
+    ];
+  }
 
-export const validateLogin = [
-  body("email").isEmail().withMessage("Please provide a valid email"),
-  body("password").not().isEmpty().withMessage("Password cannot be empty"),
+  static login() {
+    return [
+      body("email").isEmail().withMessage("Please provide a valid email"),
+      body("password").not().isEmpty().withMessage("Password cannot be empty"),
+    ];
+  }
 
-  (req: Request, res: Response, next: NextFunction) => {
+  static passwordResetRequest() {
+    return [body("email").isEmail().withMessage("Invalid email address")];
+  }
+  static resetPassword() {
+    return [
+      body("token").notEmpty().withMessage("Token is required"),
+      body("newPassword")
+        .isLength({ min: 6 })
+        .withMessage("New password must be at least 6 characters long"),
+    ];
+  }
+
+  static handleValidationResult(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
     next();
-  },
-];
+  }
+}
 
-export const validatePasswordResetRequest = [
-  body("email").isEmail().withMessage("Invalid email address"),
-  (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  },
-];
-
-export const validateResetPassword = [
-  body("token").notEmpty().withMessage("Token is required"),
-  body("newPassword")
-    .isLength({ min: 6 })
-    .withMessage("New password must be at least 6 characters long"),
-  (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  },
-];
+export default Validator;

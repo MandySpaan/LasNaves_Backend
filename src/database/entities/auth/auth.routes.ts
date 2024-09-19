@@ -22,7 +22,7 @@ router.post(
   AuthController.login
 );
 router.post(
-  "/password-reset-request",
+  "/request-password-reset",
   Validator.passwordResetRequest(),
   Validator.handleValidationResult,
   AuthController.requestPasswordReset

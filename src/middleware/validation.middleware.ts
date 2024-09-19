@@ -51,6 +51,15 @@ class Validator {
       body("newPassword")
         .isLength({ min: 6 })
         .withMessage("New password must be at least 6 characters long"),
+      body("confirmNewPassword")
+        .notEmpty()
+        .withMessage("confirmNewPassword is required")
+        .custom((value, { req }) => {
+          if (value !== req.body.newPassword) {
+            throw new Error("Passwords do not match");
+          }
+          return true;
+        }),
     ];
   }
 

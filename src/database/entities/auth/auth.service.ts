@@ -56,6 +56,28 @@ class AuthService {
     return userWithoutPassword;
   }
 
+  async resendVerificationEmail(email: string): Promise<void> {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      throw new Error("User with this email does not exist.");
+    }
+
+    if (user.isVerified) {
+      throw new Error("This account is already verified.");
+    }
+
+    const newVerificationToken = crypto.randomBytes(32).toString("hex");
+    const newVerificationTokenExpires = new Date(Date.now() + 3600000);
+
+    user.verificationToken = newVerificationToken;
+    user.verificationTokenExpires = newVerificationTokenExpires;
+
+    await user.save();
+
+    await sendVerificationEmail(email, newVerificationToken);
+  }
+
   async verifyEmail(token: string): Promise<boolean> {
     const user = await User.findOne({
       verificationToken: token,

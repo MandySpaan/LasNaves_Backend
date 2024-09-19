@@ -13,6 +13,12 @@ class AuthController {
     });
   }
 
+  async resendVerification(req: Request, res: Response) {
+    const { email } = req.body;
+    await AuthService.resendVerificationEmail(email);
+    res.status(200).json({ message: "Verification email sent" });
+  }
+
   async verifyEmail(req: Request, res: Response) {
     const { token } = req.query as { token: string };
     const result = await AuthService.verifyEmail(token);

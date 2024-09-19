@@ -49,7 +49,11 @@ class Validator {
   ) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      const sanitizedErrors = errors.array().map((error) => ({
+        ...error,
+        value: undefined,
+      }));
+      return res.status(400).json({ errors: sanitizedErrors });
     }
     next();
   }

@@ -1,7 +1,9 @@
 import express from "express";
+import "express-async-errors";
 import "dotenv/config";
 import { dbConnection } from "./database/db";
 import { router } from "./router";
+import errorHandler from "./middleware/error.middleware";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +18,8 @@ app.get("/healthy", (req, res) => {
 });
 
 app.use("/", router);
+
+app.use(errorHandler);
 
 dbConnection()
   .then(() => {

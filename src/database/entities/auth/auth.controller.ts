@@ -14,60 +14,43 @@ class AuthController {
   }
 
   async login(req: Request, res: Response) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const sanitizedErrors = errors.array().map((error: any) => ({
-        ...error,
-        value: undefined,
-      }));
-      return res.status(400).json({ errors: sanitizedErrors });
-    }
-
     const { email, password } = req.body;
+    const token = await AuthService.loginUser(email, password);
 
-    try {
-      const token = await AuthService.loginUser(email, password);
-      if (!token) {
-        return res.status(400).json({ message: "Invalid email or password" });
-      }
-      return res.json({ token });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: "Server error" });
+    if (!token) {
+      return res.status(400).json({ message: "Invalid email or password" });
     }
+
+    res.status(200).json({
+      message: "User logged in successfully",
+      token,
+    });
   }
 
   async requestPasswordReset(req: Request, res: Response) {
     const { email } = req.body;
+    const resetToken = await AuthService.generatePasswordResetToken(email);
 
-    try {
-      const resetToken = await AuthService.generatePasswordResetToken(email);
-      if (!resetToken) {
-        return res.status(400).json({ message: "User not found" });
-      }
-
-      // ToDo: This has to be changed to send the resetToken via email in real implementation.
-      return res.status(200).json({ message: "Password reset email sent" });
-    } catch (error) {
-      return res.status(500).json({ message: "Server error" });
+    if (!resetToken) {
+      return res.status(400).json({ message: "User not found" });
     }
+
+    // ToDo: This has to be changed to send the resetToken via email in real implementation.
+    res.status(200).json({ message: "Password reset email sent" });
   }
 
   async resetPassword(req: Request, res: Response) {
     const { token, newPassword } = req.body;
+    const isResetSuccessful = await AuthService.resetPassword(
+      token,
+      newPassword
+    );
 
-    try {
-      const isResetSuccessful = await AuthService.resetPassword(
-        token,
-        newPassword
-      );
-      if (!isResetSuccessful) {
-        return res.status(400).json({ message: "Invalid or expired token" });
-      }
-      return res.status(200).json({ message: "Password reset successful" });
-    } catch (error) {
-      return res.status(500).json({ message: "Server error" });
+    if (!isResetSuccessful) {
+      return res.status(400).json({ message: "Invalid or expired token" });
     }
+
+    res.status(200).json({ message: "Password reset successful" });
   }
 }
 

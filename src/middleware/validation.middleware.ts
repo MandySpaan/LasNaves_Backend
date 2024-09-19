@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { body, validationResult } from "express-validator";
+import User from "../database/entities/users/user.model";
 
 class Validator {
   static register() {
@@ -27,6 +28,18 @@ class Validator {
     return [
       body("email").isEmail().withMessage("Please provide a valid email"),
       body("password").not().isEmpty().withMessage("Password cannot be empty"),
+      body("email").custom(async (email) => {
+        const user = await User.findOne({ email });
+        if (!user) {
+          throw new Error("User not found");
+        }
+        if (!user.isVerified) {
+          throw new Error(
+            "Email is not verified. Please verify your email first."
+          );
+        }
+        return true;
+      }),
     ];
   }
 

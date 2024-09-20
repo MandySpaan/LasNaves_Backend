@@ -44,6 +44,10 @@ class UserService {
       {}
     ).select("-password");
   }
+
+  async getAllUsers() {
+    return await User.find().select("-password");
+  }
 }
 
 export default new UserService();

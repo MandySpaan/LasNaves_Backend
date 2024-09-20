@@ -57,6 +57,11 @@ class UserController {
       .status(200)
       .json({ message: "Password updated successfully", user: updatedUser });
   }
+
+  async getAllUsers(req: Request, res: Response) {
+    const users = await UserService.getAllUsers();
+    return res.status(200).json({ message: "All users retrieved", users });
+  }
 }
 
 export default new UserController();

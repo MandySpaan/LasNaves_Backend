@@ -1,8 +1,5 @@
-// auth.service.ts
-
-import jwt from "jsonwebtoken";
 import User from "./user.model";
-import { AuthRequest } from "../../../middleware/auth.middleware";
+import bcrypt from "bcrypt";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 // The "your_jwt_secret" can be set as a fallback value in case the .env is not set
@@ -35,6 +32,17 @@ class UserService {
       new: true,
       runValidators: true,
     }).select("-password");
+  }
+
+  async updatePassword(userId: string, password: string) {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    return await User.findByIdAndUpdate(
+      userId,
+      { password: hashedPassword },
+      {}
+    ).select("-password");
   }
 }
 

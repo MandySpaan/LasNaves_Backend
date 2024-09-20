@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from "express";
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 // The "your_jwt_secret" can be set as a fallback value in case the .env is not set
 
-interface AuthRequest extends Request {
+export interface AuthRequest extends Request {
   user?: {
     userId: string;
     email: string;

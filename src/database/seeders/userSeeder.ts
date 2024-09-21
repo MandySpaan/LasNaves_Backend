@@ -1,18 +1,8 @@
-import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import User from "../entities/users/user.model";
-import dotenv from "dotenv";
 
-dotenv.config();
-
-const MONGO_URI = process.env.MONGO_URI || "";
-// The empty string can be set as a fallback value in case the .env is not set
-
-const seedUsers = async () => {
+export const userSeeder = async () => {
   try {
-    await mongoose.connect(MONGO_URI);
-    console.log("Connected to MongoDB");
-
     const hashPassword = async (password: string) => {
       const salt = await bcrypt.genSalt(10);
       return await bcrypt.hash(password, salt);
@@ -60,13 +50,8 @@ const seedUsers = async () => {
     }
 
     await User.insertMany(users);
-    console.log("Seed users successfully inserted");
-
-    await mongoose.connection.close();
-    console.log("Database connection closed");
+    console.log("Users seeded successfully");
   } catch (error) {
     console.error("Error seeding users:", error);
   }
 };
-
-seedUsers();

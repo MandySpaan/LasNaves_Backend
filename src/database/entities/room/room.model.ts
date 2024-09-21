@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface IRoom extends Document {
+export interface IRoom extends Document {
   roomName: string;
   capacity: number;
   roomType: "Meeting Room" | "Office Space" | "Other";

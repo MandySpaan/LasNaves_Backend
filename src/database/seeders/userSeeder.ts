@@ -28,6 +28,7 @@ const seedUsers = async () => {
         dni: `superadminDNI${i}`,
         password: await hashPassword("SuperAdminPassword123"),
         role: "superAdmin",
+        isVerified: true,
         isActive: true,
       });
     }
@@ -40,6 +41,7 @@ const seedUsers = async () => {
         dni: `adminDNI${i}`,
         password: await hashPassword("AdminPassword123"),
         role: "admin",
+        isVerified: true,
         isActive: true,
       });
     }
@@ -52,6 +54,7 @@ const seedUsers = async () => {
         dni: `userDNI${i}`,
         password: await hashPassword("UserPassword123"),
         role: "user",
+        isVerified: true,
         isActive: true,
       });
     }

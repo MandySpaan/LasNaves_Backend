@@ -41,7 +41,27 @@ export async function isAdmin(
     return res.status(404).send({ message: "User not found" });
   }
   if (user.role !== "admin" && user.role !== "superAdmin") {
-    return res.status(403).send({ message: "Unauthorized" });
+    return res
+      .status(403)
+      .send({ message: "Unauthorized, you need to be admin for this" });
+  }
+  next();
+}
+
+export async function isSuperAdmin(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) {
+  const userId = req.user?.userId;
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).send({ message: "User not found" });
+  }
+  if (user.role !== "superAdmin") {
+    return res
+      .status(403)
+      .send({ message: "Unauthorized, you need to be super admin for this" });
   }
   next();
 }

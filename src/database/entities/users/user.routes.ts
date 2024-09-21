@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { authToken, isAdmin } from "../../../middleware/auth.middleware";
 import UserController from "./user.controller";
-import Validator from "../../../middleware/validation.middleware";
+import UserValidator from "../../../middleware/validators/userValidator";
+import handleValidationResult from "../../../middleware/validators/validationResultHandler";
 
 const router = Router();
 
@@ -10,8 +11,8 @@ router.put("/profile/own", authToken, UserController.updateOwnProfile);
 router.put(
   "/change-password",
   authToken,
-  Validator.changePassword(),
-  Validator.handleValidationResult,
+  UserValidator.changePassword(),
+  handleValidationResult,
   UserController.changePassword
 );
 router.get("/all", authToken, isAdmin, UserController.getAllUsers);

@@ -1,33 +1,34 @@
 import { Router } from "express";
 import AuthController from "./auth.controller";
-import Validator from "../../../middleware/validation.middleware";
+import AuthValidator from "../../../middleware/validators/authValidator";
+import handleValidationResult from "../../../middleware/validators/validationResultHandler";
 
 const router = Router();
 
 router.post(
   "/register",
-  Validator.register(),
-  Validator.handleValidationResult,
+  AuthValidator.register(),
+  handleValidationResult,
   AuthController.register
 );
 router.post("/resend-verification", AuthController.resendVerification);
 router.get("/verify-email", AuthController.verifyEmail);
 router.post(
   "/login",
-  Validator.login(),
-  Validator.handleValidationResult,
+  AuthValidator.login(),
+  handleValidationResult,
   AuthController.login
 );
 router.post(
   "/request-password-reset",
-  Validator.passwordResetRequest(),
-  Validator.handleValidationResult,
+  AuthValidator.passwordResetRequest(),
+  handleValidationResult,
   AuthController.requestPasswordReset
 );
 router.post(
   "/reset-password",
-  Validator.resetPassword(),
-  Validator.handleValidationResult,
+  AuthValidator.resetPassword(),
+  handleValidationResult,
   AuthController.resetPassword
 );
 

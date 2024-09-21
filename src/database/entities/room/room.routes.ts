@@ -1,7 +1,8 @@
 import { Router } from "express";
-import RoomController from "./room.controller";
 import { authToken, isSuperAdmin } from "../../../middleware/auth.middleware";
-import Validator from "../../../middleware/validation.middleware";
+import RoomController from "./room.controller";
+import RoomValidator from "../../../middleware/validators/roomValidator";
+import handleValidationResult from "../../../middleware/validators/validationResultHandler";
 
 const router = Router();
 
@@ -10,8 +11,8 @@ router.post(
   "/create",
   authToken,
   isSuperAdmin,
-  Validator.createRoom(),
-  Validator.handleValidationResult,
+  RoomValidator.createRoom(),
+  handleValidationResult,
   RoomController.createRoom
 );
 

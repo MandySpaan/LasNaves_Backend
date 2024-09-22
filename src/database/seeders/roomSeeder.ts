@@ -1,4 +1,4 @@
-import Room from "../entities/room/room.model";
+import Room from "../entities/rooms/room.model";
 
 export const roomSeeder = async () => {
   const rooms = [

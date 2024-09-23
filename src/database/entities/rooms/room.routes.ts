@@ -15,5 +15,6 @@ router.post(
   handleValidationResult,
   RoomController.createRoom
 );
+router.get("/occupancy/:roomId", RoomController.checkRoomOccupancy);
 
 export { router };

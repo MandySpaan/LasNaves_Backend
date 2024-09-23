@@ -1,3 +1,4 @@
+import Access from "../access/access.model";
 import Room from "./room.model";
 import { IRoom } from "./room.model";
 
@@ -22,6 +23,25 @@ class roomService {
 
     const savedRoom = await newRoom.save();
     return savedRoom;
+  }
+
+  async getRoomOccupancy(roomId: string) {
+    const room = await Room.findById(roomId);
+
+    if (!room) {
+      throw new Error("Room not found");
+    }
+
+    const currentOccupancy = await Access.countDocuments({
+      roomId,
+    });
+
+    const placesAvailable = room.capacity - currentOccupancy;
+
+    return {
+      currentOccupancy,
+      placesAvailable,
+    };
   }
 }
 

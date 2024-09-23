@@ -1,3 +1,4 @@
+import AccessHistory from "../accessHistory/accessHistory.model";
 import Room from "../rooms/room.model";
 import Access from "./access.model";
 
@@ -22,6 +23,28 @@ class AccessService {
 
     await newAccess.save();
     return newAccess;
+  }
+
+  async checkOut(userId: string, roomId: string) {
+    const access = await Access.findOne({ userId, roomId, active: true });
+
+    if (!access) {
+      throw new Error("User not checked in");
+    }
+
+    access.exitDateTime = new Date();
+    access.active = false;
+
+    const accessHistory = new AccessHistory({
+      userId,
+      roomId,
+      entryDateTime: access.entryDateTime,
+      exitDateTime: access.exitDateTime,
+    });
+
+    await accessHistory.save();
+    await Access.deleteOne({ _id: access._id });
+    return accessHistory;
   }
 }
 

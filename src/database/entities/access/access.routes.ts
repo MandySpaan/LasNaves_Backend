@@ -5,5 +5,6 @@ import { authToken } from "../../../middleware/auth.middleware";
 const router = Router();
 
 router.post("/check-in/:roomId", authToken, AccessController.checkIn);
+router.post("/check-out/:roomId", authToken, AccessController.checkOut);
 
 export { router };

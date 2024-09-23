@@ -11,6 +11,16 @@ class AccessController {
 
     res.status(200).send({ message: "Checked in successfully", newAccess });
   }
-}
 
+  async checkOut(req: AuthRequest, res: Response) {
+    const userId = req.user?.userId as string;
+    const roomId = req.params.roomId as string;
+
+    const accessHistory = await AccessService.checkOut(userId, roomId);
+
+    res
+      .status(200)
+      .send({ message: "Checked out successfully", accessHistory });
+  }
+}
 export default new AccessController();

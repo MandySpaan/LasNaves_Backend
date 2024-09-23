@@ -7,7 +7,7 @@ class AccessService {
     const activeAccess = await Access.findOne({
       userId,
       roomId,
-      status: "entry",
+      active: true,
     });
 
     if (activeAccess) {
@@ -18,7 +18,6 @@ class AccessService {
       userId,
       roomId,
       entryDateTime: new Date(),
-      status: "entry",
     });
 
     await newAccess.save();

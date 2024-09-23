@@ -7,7 +7,7 @@ interface IAccess extends Document {
   roomId: IRoom["_id"];
   entryDateTime: Date;
   exitDateTime?: Date;
-  status: "entry" | "exit";
+  active: boolean;
 }
 
 const accessSchema: Schema = new Schema(
@@ -16,7 +16,7 @@ const accessSchema: Schema = new Schema(
     roomId: { type: Schema.Types.ObjectId, ref: "Room", required: true },
     entryDateTime: { type: Date, required: true },
     exitDateTime: { type: Date },
-    status: { type: String, enum: ["entry", "exit"], required: true },
+    active: { type: Boolean, default: true },
   },
   {
     timestamps: true,

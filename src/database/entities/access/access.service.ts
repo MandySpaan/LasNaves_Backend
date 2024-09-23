@@ -8,7 +8,6 @@ class AccessService {
     const activeAccess = await Access.findOne({
       userId,
       roomId,
-      active: true,
     });
 
     if (activeAccess) {
@@ -26,14 +25,13 @@ class AccessService {
   }
 
   async checkOut(userId: string, roomId: string) {
-    const access = await Access.findOne({ userId, roomId, active: true });
+    const access = await Access.findOne({ userId, roomId });
 
     if (!access) {
       throw new Error("User not checked in");
     }
 
     access.exitDateTime = new Date();
-    access.active = false;
 
     const accessHistory = new AccessHistory({
       userId,

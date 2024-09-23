@@ -34,6 +34,7 @@ class roomService {
 
     const currentOccupancy = await Access.countDocuments({
       roomId,
+      active: true,
     });
 
     const placesAvailable = room.capacity - currentOccupancy;

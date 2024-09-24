@@ -22,10 +22,10 @@ class AccessService {
     });
 
     if (existingAccess) {
-      if (existingAccess.active) {
+      if (existingAccess.status === "active") {
         throw new Error("User already checked in");
       }
-      existingAccess.active = true;
+      existingAccess.status = "active";
       await existingAccess.save();
       return existingAccess;
     }
@@ -39,14 +39,15 @@ class AccessService {
     });
 
     if (accessElsewhere) {
-      if (accessElsewhere.active) {
+      if (accessElsewhere.status === "active") {
         throw new Error(
           `User already checked in at roomId: ${accessElsewhere.roomId}`
         );
+      } else if (accessElsewhere.status === "reserved") {
+        throw new Error(
+          `User has a reservation at roomId: ${accessElsewhere.roomId}`
+        );
       }
-      throw new Error(
-        `User has a reservation at roomId: ${accessElsewhere.roomId}`
-      );
     }
 
     const currentOccupancy = await Access.countDocuments({
@@ -66,6 +67,7 @@ class AccessService {
       userId,
       roomId,
       entryDateTime: currentDateTime,
+      status: "active",
     });
 
     await newAccess.save();
@@ -73,20 +75,20 @@ class AccessService {
   }
 
   async checkOut(userId: string, roomId: string) {
-    const access = await Access.findOne({ userId, roomId, active: true });
+    const access = await Access.findOne({ userId, roomId, status: "active" });
 
     if (!access) {
-      throw new Error("User not checked in");
+      throw new Error(`User not checked into roomId: ${roomId}`);
     }
 
     access.exitDateTime = new Date();
-    access.active = false;
 
     const accessHistory = new AccessHistory({
       userId,
       roomId,
       entryDateTime: access.entryDateTime,
       exitDateTime: access.exitDateTime,
+      status: "completed",
     });
 
     await accessHistory.save();
@@ -128,6 +130,7 @@ class AccessService {
         $lt: exitDateTime,
       },
       exitDateTime: { $gt: entryDateTime },
+      status: "reserved",
     });
 
     if (existingReservation) {
@@ -157,7 +160,7 @@ class AccessService {
         roomId,
         entryDateTime,
         exitDateTime,
-        active: false,
+        status: "reserved",
       });
 
       await newAccess.save({ session });
@@ -181,12 +184,23 @@ class AccessService {
       throw new Error("User not authorized to cancel reservation");
     }
 
-    if (access.active) {
-      throw new Error("Cannot cancel active reservation");
+    if (access.status === "active") {
+      throw new Error(
+        "User already checked in, cannot cancel: please check out"
+      );
     }
 
+    const accessHistory = new AccessHistory({
+      userId,
+      roomId: access.roomId,
+      entryDateTime: access.entryDateTime,
+      exitDateTime: access.exitDateTime,
+      status: "cancelled",
+    });
+
+    await accessHistory.save();
     await Access.deleteOne({ _id: accessId });
-    return access;
+    return accessHistory;
   }
 }
 

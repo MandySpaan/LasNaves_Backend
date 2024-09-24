@@ -62,6 +62,16 @@ class UserController {
     const users = await UserService.getAllUsers();
     return res.status(200).json({ message: "All users retrieved", users });
   }
+
+  async getUsersCurrentAccess(req: AuthRequest, res: Response) {
+    const userId = req.params.userId;
+
+    const currentAccess = await UserService.usersCurrentAccess(userId);
+
+    return res
+      .status(200)
+      .json({ message: "User's current access retrieved", currentAccess });
+  }
 }
 
 export default new UserController();

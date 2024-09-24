@@ -16,5 +16,11 @@ router.put(
   UserController.changePassword
 );
 router.get("/all", authToken, isAdmin, UserController.getAllUsers);
+router.get(
+  "/:userId/current-access",
+  authToken,
+  isAdmin,
+  UserController.getUsersCurrentAccess
+);
 
 export { router };

@@ -22,5 +22,21 @@ class AccessController {
       .status(200)
       .send({ message: "Checked out successfully", accessHistory });
   }
+
+  async makeReservation(req: AuthRequest, res: Response) {
+    const userId = req.user?.userId as string;
+    const roomId = req.params.roomId as string;
+    const entryDateTime = req.body.entryDateTime as Date;
+    const exitDateTime = req.body.exitDateTime as Date;
+
+    const newReservation = await AccessService.reservePlace(
+      userId,
+      roomId,
+      entryDateTime,
+      exitDateTime
+    );
+
+    res.status(200).send({ message: "Reserved successfully", newReservation });
+  }
 }
 export default new AccessController();

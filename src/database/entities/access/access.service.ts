@@ -30,6 +30,25 @@ class AccessService {
       return existingAccess;
     }
 
+    const accessElsewhere = await Access.findOne({
+      userId,
+      entryDateTime: {
+        $lte: currentDateTime,
+      },
+      exitDateTime: { $gte: currentDateTime },
+    });
+
+    if (accessElsewhere) {
+      if (accessElsewhere.active) {
+        throw new Error(
+          `User already checked in at roomId: ${accessElsewhere.roomId}`
+        );
+      }
+      throw new Error(
+        `User has a reservation at roomId: ${accessElsewhere.roomId}`
+      );
+    }
+
     const currentOccupancy = await Access.countDocuments({
       roomId,
       entryDateTime: {

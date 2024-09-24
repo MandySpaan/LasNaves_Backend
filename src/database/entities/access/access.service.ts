@@ -10,9 +10,32 @@ class AccessService {
       throw new Error("Room not found");
     }
 
+    const currentDateTime = new Date();
+
+    const existingAccess = await Access.findOne({
+      userId,
+      roomId,
+      entryDateTime: {
+        $lte: currentDateTime,
+      },
+      exitDateTime: { $gte: currentDateTime },
+    });
+
+    if (existingAccess) {
+      if (existingAccess.active) {
+        throw new Error("User already checked in");
+      }
+      existingAccess.active = true;
+      await existingAccess.save();
+      return existingAccess;
+    }
+
     const currentOccupancy = await Access.countDocuments({
       roomId,
-      active: true,
+      entryDateTime: {
+        $lte: currentDateTime,
+      },
+      exitDateTime: { $gte: currentDateTime },
     });
 
     const placesAvailable = room.capacity - currentOccupancy;
@@ -20,20 +43,10 @@ class AccessService {
       throw new Error("Room is full");
     }
 
-    const activeAccess = await Access.findOne({
-      userId,
-      roomId,
-      active: true,
-    });
-
-    if (activeAccess) {
-      throw new Error("User already checked in");
-    }
-
     const newAccess = new Access({
       userId,
       roomId,
-      entryDateTime: new Date(),
+      entryDateTime: currentDateTime,
     });
 
     await newAccess.save();

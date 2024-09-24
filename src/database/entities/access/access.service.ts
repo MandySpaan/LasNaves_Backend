@@ -5,6 +5,20 @@ import Access from "./access.model";
 class AccessService {
   async checkIn(userId: string, roomId: string) {
     const room = await Room.findById(roomId);
+    if (!room) {
+      throw new Error("Room not found");
+    }
+
+    const currentOccupancy = await Access.countDocuments({
+      roomId,
+      active: true,
+    });
+
+    const placesAvailable = room.capacity - currentOccupancy;
+    if (placesAvailable <= 0) {
+      throw new Error("Room is full");
+    }
+
     const activeAccess = await Access.findOne({
       userId,
       roomId,

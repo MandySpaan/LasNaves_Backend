@@ -4,6 +4,34 @@ import Room from "../rooms/room.model";
 import Access from "./access.model";
 
 class AccessService {
+  async currentOccupancy(roomId: string) {
+    const currentDateTime = new Date();
+
+    const currentOccupancy = await Access.find({
+      roomId,
+      entryDateTime: {
+        $lte: currentDateTime,
+      },
+      status: "active",
+    });
+
+    if (!currentOccupancy || currentOccupancy.length === 0) {
+      throw new Error("No current occupancy found");
+    }
+
+    const populatedOccupancy = await Promise.all(
+      currentOccupancy.map((access) =>
+        access.populate("userId", "name surname")
+      )
+    );
+
+    const occupancyUsers = populatedOccupancy.map(
+      (access: any) => `${access.userId.name} ${access.userId.surname}`
+    );
+
+    return occupancyUsers;
+  }
+
   async checkIn(userId: string, roomId: string) {
     const room = await Room.findById(roomId);
     if (!room) {

@@ -3,6 +3,17 @@ import { AuthRequest } from "../../../middleware/auth.middleware";
 import AccessService from "./access.service";
 
 class AccessController {
+  async getCurrentOccupancy(req: AuthRequest, res: Response) {
+    const roomId = req.params.roomId as string;
+
+    const currentOccupancy = await AccessService.currentOccupancy(roomId);
+
+    res.status(200).send({
+      message: `There are people currently checked into roomId: ${roomId}`,
+      currentOccupancy,
+    });
+  }
+
   async checkIn(req: AuthRequest, res: Response) {
     const userId = req.user?.userId as string;
     const roomId = req.params.roomId as string;

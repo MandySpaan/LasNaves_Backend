@@ -7,5 +7,10 @@ const router = Router();
 router.post("/check-in/:roomId", authToken, AccessController.checkIn);
 router.post("/check-out/:roomId", authToken, AccessController.checkOut);
 router.post("/reserve/:roomId", authToken, AccessController.makeReservation);
+router.delete(
+  "/cancel/:accessId",
+  authToken,
+  AccessController.cancelOwnReservation
+);
 
 export { router };

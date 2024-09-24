@@ -38,5 +38,17 @@ class AccessController {
 
     res.status(200).send({ message: "Reserved successfully", newReservation });
   }
+
+  async cancelOwnReservation(req: AuthRequest, res: Response) {
+    const userId = req.user?.userId as string;
+    const accessId = req.params.accessId as string;
+
+    const cancellation = await AccessService.cancelOwnReservation(
+      userId,
+      accessId
+    );
+
+    res.status(200).send({ message: "Reservation cancelled", cancellation });
+  }
 }
 export default new AccessController();

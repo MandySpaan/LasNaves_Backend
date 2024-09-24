@@ -170,6 +170,24 @@ class AccessService {
       throw new Error("Failed to reserve place");
     }
   }
+
+  async cancelOwnReservation(userId: string, accessId: string) {
+    const access = await Access.findOne({ _id: accessId });
+    if (!access) {
+      throw new Error("Reservation not found");
+    }
+
+    if ((access.userId as string).toString() !== userId) {
+      throw new Error("User not authorized to cancel reservation");
+    }
+
+    if (access.active) {
+      throw new Error("Cannot cancel active reservation");
+    }
+
+    await Access.deleteOne({ _id: accessId });
+    return access;
+  }
 }
 
 export default new AccessService();

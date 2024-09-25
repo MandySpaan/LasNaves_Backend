@@ -16,6 +16,24 @@ class AccessHistoryController {
       data: accessHistoryByDate,
     });
   }
+
+  async getRoomsAccessHistoriesByDate(req: Request, res: Response) {
+    const startDate = req.query.startDate as string;
+    const endDate = req.query.endDate as string;
+    const roomId = req.params.roomId;
+
+    const roomAccessHistoryByDate =
+      await accessHistoryService.roomAccessHistoryByDate(
+        startDate,
+        endDate,
+        roomId
+      );
+
+    res.status(200).send({
+      message: "Room's access histories retrieved successfully",
+      data: roomAccessHistoryByDate,
+    });
+  }
 }
 
 export default new AccessHistoryController();

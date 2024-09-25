@@ -29,6 +29,36 @@ class accessHistoryService {
 
     return accessHistories;
   }
+
+  async roomAccessHistoryByDate(
+    startDate: string,
+    endDate: string,
+    roomId: string
+  ) {
+    if (!startDate || !endDate) {
+      throw new Error("startDate and endDate query parameters are required");
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      throw new Error("Invalid date format. Please provide valid dates.");
+    }
+
+    const roomsAccessHistories = await AccessHistory.find({
+      roomId: roomId,
+      entryDateTime: { $gte: start, $lte: end },
+    })
+      .populate("userId", "name surName")
+      .populate("roomId", "roomName");
+
+    if (!roomsAccessHistories || roomsAccessHistories.length === 0) {
+      throw new Error("No access histories found for the specified date range");
+    }
+
+    return roomsAccessHistories;
+  }
 }
 
 export default new accessHistoryService();

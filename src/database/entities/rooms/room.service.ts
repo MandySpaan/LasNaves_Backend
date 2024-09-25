@@ -44,6 +44,28 @@ class roomService {
       placesAvailable,
     };
   }
+
+  async roomCurrentStatus(roomId: string) {
+    const access = await Access.find({ roomId: roomId })
+      .populate("userId", "name surname")
+      .populate("roomId", "roomName");
+
+    if (!access || access.length === 0) {
+      throw new Error("Room has no current check-ins nor reservations");
+    }
+
+    const result = access.map((access: any) => ({
+      roomName: access.roomId.roomName,
+      status: access.status,
+      userName: `${access.userId.name} ${access.userId.surname}`,
+      accessDateTime: access.entryDateTime,
+      exitDateTime: access.exitDateTime ? access.exitDateTime : undefined,
+    }));
+
+    return {
+      access: result,
+    };
+  }
 }
 
 export default new roomService();

@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { authToken, isSuperAdmin } from "../../../middleware/auth.middleware";
+import {
+  authToken,
+  isAdmin,
+  isSuperAdmin,
+} from "../../../middleware/auth.middleware";
 import RoomController from "./room.controller";
 import RoomValidator from "../../../middleware/validators/roomValidator";
 import handleValidationResult from "../../../middleware/validators/validationResultHandler";
@@ -16,5 +20,11 @@ router.post(
   RoomController.createRoom
 );
 router.get("/occupancy/:roomId", RoomController.checkRoomOccupancy);
+router.get(
+  "/status/:roomId",
+  authToken,
+  isAdmin,
+  RoomController.getRoomsCurrentStatus
+);
 
 export { router };

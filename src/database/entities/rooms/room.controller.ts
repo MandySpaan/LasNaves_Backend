@@ -20,6 +20,14 @@ class roomController {
       .status(200)
       .json({ message: "Room occupancy retrieved", roomOccupancy });
   };
+
+  getRoomsCurrentStatus = async (req: Request, res: Response) => {
+    const roomId = req.params.roomId;
+    const roomStatus = await roomService.roomCurrentStatus(roomId);
+    return res
+      .status(200)
+      .json({ message: "Room status retrieved", roomStatus });
+  };
 }
 
 export default new roomController();

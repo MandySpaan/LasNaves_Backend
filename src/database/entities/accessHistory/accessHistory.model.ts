@@ -7,7 +7,7 @@ interface IAccessHistory extends Document {
   roomId: IRoom["_id"];
   entryDateTime: Date;
   exitDateTime?: Date;
-  status: "completed" | "no-show" | "cancelled";
+  status: "completed" | "completed (no check-out)" | "no-show" | "cancelled";
 }
 
 const accessHistorySchema: Schema = new Schema(
@@ -18,7 +18,7 @@ const accessHistorySchema: Schema = new Schema(
     exitDateTime: { type: Date },
     status: {
       type: String,
-      enum: ["completed", "no-show", "cancelled"],
+      enum: ["completed", "completed (no check-out)", "no-show", "cancelled"],
       default: "completed",
     },
   },

@@ -18,5 +18,11 @@ router.delete(
   authToken,
   AccessController.cancelOwnReservation
 );
+router.delete(
+  "/move-to-history",
+  authToken,
+  isAdmin,
+  AccessController.moveOldAccessesToAccessHistory
+);
 
 export { router };

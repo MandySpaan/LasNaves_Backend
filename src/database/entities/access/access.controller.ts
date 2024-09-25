@@ -61,5 +61,14 @@ class AccessController {
 
     res.status(200).send({ message: "Reservation cancelled", cancellation });
   }
+
+  async moveOldAccessesToAccessHistory(req: AuthRequest, res: Response) {
+    const currentDate = new Date();
+    const movedAccesses = await AccessService.moveToHistory(currentDate);
+
+    res
+      .status(200)
+      .send({ message: "Moved old accesses to history", movedAccesses });
+  }
 }
 export default new AccessController();

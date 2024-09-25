@@ -230,6 +230,55 @@ class AccessService {
     await Access.deleteOne({ _id: accessId });
     return accessHistory;
   }
+
+  moveToHistory = async (currentDate: Date) => {
+    const startOfToday = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate()
+    );
+
+    const oldAccesses = await Access.find({
+      entryDateTime: { $lt: startOfToday },
+    });
+
+    if (!oldAccesses || oldAccesses.length === 0) {
+      throw new Error("No old accesses found");
+    }
+
+    const newAccessHistories: any = [];
+
+    await Promise.all(
+      oldAccesses.map(async (access) => {
+        let accessHistory;
+
+        if (access.status === "active") {
+          accessHistory = new AccessHistory({
+            userId: access.userId,
+            roomId: access.roomId,
+            entryDateTime: access.entryDateTime,
+            status: "completed (no check-out)",
+          });
+        } else if (access.status === "reserved") {
+          accessHistory = new AccessHistory({
+            userId: access.userId,
+            roomId: access.roomId,
+            entryDateTime: access.entryDateTime,
+            exitDateTime: access.exitDateTime,
+            status: "no-show",
+          });
+        }
+
+        if (accessHistory) {
+          await accessHistory.save();
+          await Access.deleteOne({ _id: access._id });
+
+          newAccessHistories.push(accessHistory);
+        }
+      })
+    );
+    return newAccessHistories;
+  };
 }
 
 export default new AccessService();

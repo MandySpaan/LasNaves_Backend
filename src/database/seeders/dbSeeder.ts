@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { userSeeder } from "./userSeeder";
 import { roomSeeder } from "./roomSeeder";
 import { accessSeeder } from "./accessSeeder";
+import { accessHistorySeeder } from "./accessHistorySeeder";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ const MONGO_URI = process.env.MONGO_URI || "";
   await userSeeder();
   await roomSeeder();
   await accessSeeder();
+  await accessHistorySeeder();
   await mongoose.connection.close();
   console.log("Database connection closed");
 })();

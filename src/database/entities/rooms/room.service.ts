@@ -7,6 +7,10 @@ class roomService {
     return await Room.find();
   }
 
+  async getRoomById(roomId: string) {
+    return await Room.findById(roomId);
+  }
+
   async createRoom(roomData: IRoom) {
     const { roomName, capacity, roomType } = roomData;
 
@@ -23,6 +27,25 @@ class roomService {
 
     const savedRoom = await newRoom.save();
     return savedRoom;
+  }
+
+  async updateRoom(roomId: string, roomData: Partial<IRoom>, currentRoom: any) {
+    const room = await Room.findById(roomId);
+
+    if (!room) {
+      throw new Error("Room not found");
+    }
+
+    const updatedFields = {
+      roomName: roomData.roomName || currentRoom.roomName,
+      capacity: roomData.capacity || currentRoom.capacity,
+      roomType: roomData.roomType || currentRoom.roomType,
+    };
+
+    return await Room.findByIdAndUpdate(roomId, updatedFields, {
+      new: true,
+      runValidators: true,
+    });
   }
 
   async getRoomOccupancy(roomId: string) {

@@ -13,6 +13,30 @@ class roomController {
     return res.status(201).json({ message: "Room created", newRoom });
   };
 
+  updateRoomById = async (req: Request, res: Response) => {
+    const roomId = req.params.roomId;
+
+    const currentRoom = await roomService.getRoomById(roomId);
+
+    if (!currentRoom) {
+      return res.status(404).json({ message: "Room not found" });
+    }
+
+    if (Object.keys(req.body).length === 0) {
+      return res.status(400).json({ message: "No fields provided for update" });
+    }
+
+    const updatedRoom = await roomService.updateRoom(
+      roomId,
+      req.body,
+      currentRoom
+    );
+
+    return res
+      .status(200)
+      .json({ message: "Room updated successfully", room: updatedRoom });
+  };
+
   checkRoomOccupancy = async (req: Request, res: Response) => {
     const roomId = req.params.roomId;
     const roomOccupancy = await roomService.getRoomOccupancy(roomId);

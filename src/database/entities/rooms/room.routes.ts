@@ -19,6 +19,12 @@ router.post(
   handleValidationResult,
   RoomController.createRoom
 );
+router.put(
+  "/update/:roomId",
+  authToken,
+  isSuperAdmin,
+  RoomController.updateRoomById
+);
 router.get("/occupancy/:roomId", RoomController.checkRoomOccupancy);
 router.get(
   "/status/:roomId",

@@ -1,4 +1,6 @@
+import { access } from "fs";
 import Access from "../access/access.model";
+import AccessHistory from "../accessHistory/accessHistory.model";
 import User from "./user.model";
 import bcrypt from "bcrypt";
 
@@ -66,6 +68,25 @@ class UserService {
       roomName: (access.roomId as any).roomName,
       entryDateTime: access.entryDateTime,
     };
+  }
+
+  async usersAccessHistory(userId: string) {
+    const accessHistory = await AccessHistory.find({ userId: userId })
+      .populate("userId", "name surname")
+      .populate("roomId", "roomName");
+
+    if (!accessHistory || accessHistory.length === 0) {
+      throw new Error("No access history found for user");
+    }
+
+    const result = accessHistory.map((access: any) => ({
+      userName: `${access.userId.name} ${access.userId.surname}`,
+      roomName: access.roomId.roomName,
+      status: access.status,
+      entryDateTime: access.entryDateTime,
+      exitDateTime: access.exitDateTime,
+    }));
+    return result;
   }
 }
 

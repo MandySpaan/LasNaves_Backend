@@ -72,6 +72,16 @@ class UserController {
       .status(200)
       .json({ message: "User's current access retrieved", currentAccess });
   }
+
+  async getUsersAccessHistory(req: AuthRequest, res: Response) {
+    const userId = req.params.userId;
+
+    const accessHistory = await UserService.usersAccessHistory(userId);
+
+    return res
+      .status(200)
+      .json({ message: "User's access history retrieved", accessHistory });
+  }
 }
 
 export default new UserController();

@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import "express-async-errors";
 import "dotenv/config";
 import { dbConnection } from "./database/db";
@@ -9,6 +10,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+app.use(cors());
 
 app.get("/healthy", (req, res) => {
   res.json({

@@ -152,12 +152,36 @@ class AdministrationService {
           status: "no-show",
         });
 
+        const completedAccesses = await AccessHistory.find({
+          roomId: roomId,
+          entryDateTime: { $gte: start, $lte: end },
+          status: "completed",
+        });
+
+        let totalStayDuration = 0;
+        let count = 0;
+
+        completedAccesses.forEach((access) => {
+          if (access.entryDateTime && access.exitDateTime) {
+            const stayDuration =
+              Number(new Date(access.exitDateTime)) -
+              Number(new Date(access.entryDateTime));
+            totalStayDuration += stayDuration;
+            count++;
+          }
+        });
+
+        let averageStayDuration = 0;
+        if (count > 0) {
+          averageStayDuration = Math.round(totalStayDuration / count / 60000);
+        }
+
         const mapRoomUsage: IRoomUsage = {
           roomName,
           capacity,
           totalAccesses,
           totalAbsences,
-          averageStayDuration: 0,
+          averageStayDuration,
           hourlyAccess: [],
         };
         roomUsage.push(mapRoomUsage);

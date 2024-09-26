@@ -1,4 +1,5 @@
 import AccessHistory from "../accessHistory/accessHistory.model";
+import { IRoomUsage } from "./administration.model";
 import { getReportDate, getYesterdayDateRange } from "./administration.utils";
 
 class AdministrationService {
@@ -90,12 +91,57 @@ class AdministrationService {
       count: user.count,
     }));
 
+    const getAllAccesses = await AccessHistory.find({
+      entryDateTime: { $gte: start, $lte: end },
+    }).populate("roomId", "roomName capacity");
+
+    const uniqueRoomIds = new Set();
+
+    const roomUsage: IRoomUsage[] = [];
+
+    getAllAccesses.forEach(async (access) => {
+      if (access.roomId) {
+        uniqueRoomIds.add(access.roomId);
+      }
+
+      await Promise.all(
+        Array.from(uniqueRoomIds).map(async (room: any) => {
+          const roomName = room.roomName;
+          const capacity = room.capacity;
+          const totalAccesses = await AccessHistory.countDocuments({
+            roomId: room._id,
+            entryDateTime: { $gte: start, $lte: end },
+            $or: [
+              { status: "completed" },
+              { status: "completed (no check-out)" },
+            ],
+          });
+          const totalAbsences = await AccessHistory.countDocuments({
+            roomId: room._id,
+            entryDateTime: { $gte: start, $lte: end },
+            status: "no-show",
+          });
+
+          const mapRoomUsage: IRoomUsage = {
+            roomName,
+            capacity,
+            totalAccesses,
+            totalAbsences,
+            averageStayDuration: 0,
+            hourlyAccess: [],
+          };
+          roomUsage.push(mapRoomUsage);
+        })
+      );
+    });
+
     return {
       reportDate,
       totalAccesses,
       totalAbsences,
       frequentPeople,
       lessFrequentPeople,
+      roomUsage,
     };
   }
 }

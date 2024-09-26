@@ -7,6 +7,8 @@ class AdministrationService {
     const { start, end } = getYesterdayDateRange();
     const reportDate = getReportDate();
 
+    console.log("reportdate", start, end);
+
     const totalAccesses = await AccessHistory.countDocuments({
       $or: [{ status: "completed" }, { status: "completed (no check-out)" }],
       entryDateTime: { $gte: start, $lte: end },
@@ -34,6 +36,25 @@ class AdministrationService {
         },
       },
       {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "userInfo",
+        },
+      },
+      {
+        $unwind: "$userInfo",
+      },
+      {
+        $project: {
+          _id: 1,
+          count: 1,
+          name: "$userInfo.name",
+          surname: "$userInfo.surname",
+        },
+      },
+      {
         $sort: { count: -1 },
       },
       {
@@ -41,16 +62,8 @@ class AdministrationService {
       },
     ]);
 
-    const populatedFrequentPeople = await AccessHistory.populate(
-      rawFrequentPeople,
-      {
-        path: "_id",
-        select: "name surname",
-      }
-    );
-
-    const frequentPeople = populatedFrequentPeople.map((user: any) => ({
-      name: `${user.userId.name} ${user.userId.surname}`,
+    const frequentPeople = rawFrequentPeople.map((user: any) => ({
+      name: `${user.name} ${user.surname}`,
       count: user.count,
     }));
 
@@ -71,6 +84,25 @@ class AdministrationService {
         },
       },
       {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "userInfo",
+        },
+      },
+      {
+        $unwind: "$userInfo",
+      },
+      {
+        $project: {
+          _id: 1,
+          count: 1,
+          name: "$userInfo.name",
+          surname: "$userInfo.surname",
+        },
+      },
+      {
         $sort: { count: 1 },
       },
       {
@@ -78,18 +110,12 @@ class AdministrationService {
       },
     ]);
 
-    const populatedLessFrequentPeople = await AccessHistory.populate(
-      rawLessFrequentPeople,
-      {
-        path: "_id",
-        select: "name surname",
-      }
-    );
-
-    const lessFrequentPeople = populatedFrequentPeople.map((user: any) => ({
-      name: `${user.userId.name} ${user.userId.surname}`,
+    const lessFrequentPeople = rawLessFrequentPeople.map((user: any) => ({
+      name: `${user.name} ${user.surname}`,
       count: user.count,
     }));
+
+    console.log("frequent", frequentPeople);
 
     const getAllAccesses = await AccessHistory.find({
       entryDateTime: { $gte: start, $lte: end },
@@ -145,3 +171,5 @@ class AdministrationService {
     };
   }
 }
+
+export default new AdministrationService();

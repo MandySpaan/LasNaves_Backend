@@ -83,6 +83,16 @@ class UserController {
       .json({ message: "Your current access retrieved", ownCurrentAccess });
   }
 
+  async getOwnReservations(req: AuthRequest, res: Response) {
+    const userId = req.user?.userId as string;
+
+    const reservations = await UserService.ownReservations(userId);
+
+    return res
+      .status(200)
+      .json({ message: "Your reservations retrieved", reservations });
+  }
+
   async getUsersAccessHistory(req: AuthRequest, res: Response) {
     const userId = req.params.userId;
 

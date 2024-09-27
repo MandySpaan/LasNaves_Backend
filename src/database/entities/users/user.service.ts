@@ -70,6 +70,29 @@ class UserService {
     };
   }
 
+  async ownReservations(userId: string) {
+    const myReservations = await Access.find({
+      userId: userId,
+      status: "reserved",
+    })
+      .populate("userId", "name surname")
+      .populate("roomId", "roomName");
+
+    if (!myReservations || myReservations.length === 0) {
+      return { message: "You have no upcoming reservations" };
+    }
+
+    const myReservationsData = await Promise.all(
+      myReservations.map(async (reservation: any) => {
+        const roomName = (reservation.roomId as any).roomName;
+        const entryDateTime = reservation.entryDateTime;
+        const exitDateTime = reservation.exitDateTime;
+        return { roomName, entryDateTime, exitDateTime };
+      })
+    );
+    return myReservationsData;
+  }
+
   async usersCurrentAccess(userId: string) {
     const access = await Access.findOne({ userId: userId, status: "active" })
       .populate("userId", "name surname")

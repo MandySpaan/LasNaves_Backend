@@ -13,6 +13,7 @@ router.get(
   authToken,
   UserController.getOwnCurrentAccess
 );
+router.get("/reservations/own", authToken, UserController.getOwnReservations);
 router.put(
   "/change-password",
   authToken,

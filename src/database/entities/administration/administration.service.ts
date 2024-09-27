@@ -248,6 +248,16 @@ class AdministrationService {
 
     return reportsByDate;
   }
+
+  async latestRoomUsage() {
+    const latestReport = await Administration.findOne().sort({
+      reportDate: -1,
+    });
+    if (!latestReport) {
+      throw new Error("No reports found");
+    }
+    return latestReport.roomUsage;
+  }
 }
 
 export default new AdministrationService();

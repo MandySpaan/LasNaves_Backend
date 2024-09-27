@@ -18,3 +18,9 @@ router.get(
   isAdmin,
   AdministrationController.getReportsByDate
 );
+router.get(
+  "/latest-room-usage",
+  authToken,
+  isAdmin,
+  AdministrationController.getLatestRoomUsage
+);

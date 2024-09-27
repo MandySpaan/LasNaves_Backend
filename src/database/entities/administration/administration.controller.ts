@@ -24,6 +24,15 @@ class AdministrationController {
       reports,
     });
   }
+
+  async getLatestRoomUsage(req: Request, res: Response) {
+    const roomUsage = await administrationService.latestRoomUsage();
+
+    res.status(200).send({
+      message: "Most recent room usage retrieved successfully",
+      roomUsage,
+    });
+  }
 }
 
 export default new AdministrationController();

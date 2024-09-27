@@ -12,3 +12,9 @@ router.post(
   isAdmin,
   AdministrationController.createDailyReport
 );
+router.get(
+  "/get-reports",
+  authToken,
+  isAdmin,
+  AdministrationController.getReportsByDate
+);

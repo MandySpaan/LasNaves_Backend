@@ -1,6 +1,6 @@
 import AccessHistory from "../accessHistory/accessHistory.model";
 import Room from "../rooms/room.model";
-import { IRoomUsage } from "./administration.model";
+import Administration, { IRoomUsage } from "./administration.model";
 import { getReportDate, getYesterdayDateRange } from "./administration.utils";
 
 class AdministrationService {
@@ -224,6 +224,29 @@ class AdministrationService {
     return {
       savedReport,
     };
+  }
+
+  async getReportsByDate(startDate: string, endDate: string) {
+    if (!startDate || !endDate) {
+      throw new Error("startDate and endDate query parameters are required");
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      throw new Error("Invalid date format. Please provide valid dates.");
+    }
+
+    const reportsByDate = await Administration.find({
+      reportDate: { $gte: start, $lte: end },
+    });
+
+    if (!reportsByDate || reportsByDate.length === 0) {
+      throw new Error("No access histories found for the specified date range");
+    }
+
+    return reportsByDate;
   }
 }
 

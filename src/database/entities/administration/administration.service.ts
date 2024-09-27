@@ -120,15 +120,15 @@ class AdministrationService {
 
     const uniqueRoomIds = new Set();
 
-    const roomUsage: IRoomUsage[] = [];
-
     for (const access of getAllAccesses) {
       if (access.roomId) {
-        uniqueRoomIds.add(access.roomId);
+        uniqueRoomIds.add(access.roomId.toString());
       }
     }
 
     const roomIdsArray = Array.from(uniqueRoomIds);
+
+    const roomUsage: IRoomUsage[] = [];
 
     await Promise.all(
       roomIdsArray.map(async (roomId: any) => {
@@ -176,25 +176,53 @@ class AdministrationService {
           averageStayDuration = Math.round(totalStayDuration / count / 60000);
         }
 
+        const buildingOpenTime = 9;
+        const buildingCloseTime = 18;
+
+        let hourlyAccess: [number, number][] = [];
+
+        for (let hour = buildingOpenTime; hour < buildingCloseTime; hour++) {
+          const hourStart = new Date(start);
+          hourStart.setHours(hour, 0, 0, 0);
+
+          const hourEnd = new Date(hourStart);
+          hourEnd.setHours(hour + 1, 0, 0, 0);
+
+          const peopleCount = await AccessHistory.countDocuments({
+            roomId: roomId,
+            entryDateTime: { $lt: hourEnd },
+            exitDateTime: { $gte: hourStart },
+            status: "completed",
+          });
+
+          hourlyAccess.push([hour, peopleCount]);
+        }
+
         const mapRoomUsage: IRoomUsage = {
           roomName,
           capacity,
           totalAccesses,
           totalAbsences,
           averageStayDuration,
-          hourlyAccess: [],
+          hourlyAccess,
         };
         roomUsage.push(mapRoomUsage);
       })
     );
 
-    return {
+    const newReport = new Administration({
       reportDate,
       totalAccesses,
       totalAbsences,
       frequentPeople,
       lessFrequentPeople,
       roomUsage,
+    });
+
+    const savedReport = await newReport.save();
+
+    return {
+      savedReport,
     };
   }
 }

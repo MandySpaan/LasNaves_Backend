@@ -11,7 +11,7 @@ export interface IRoomUsage {
   totalAccesses: number;
   totalAbsences: number;
   averageStayDuration: number;
-  hourlyAccess: number[];
+  hourlyAccess: [number, number][];
 }
 
 export interface IAdministration extends Document {
@@ -35,7 +35,7 @@ const RoomUsageSchema: Schema = new Schema({
   totalAbsences: { type: Number, required: true },
   averageStayDuration: { type: Number, required: true },
   hourlyAccess: {
-    type: [Number],
+    type: [[Number]],
     required: true,
   },
 });
@@ -49,7 +49,9 @@ const AdministrationSchema: Schema = new Schema({
   roomUsage: { type: [RoomUsageSchema], required: true },
 });
 
-export default mongoose.model<IAdministration>(
+const Administration = mongoose.model<IAdministration>(
   "Administration",
   AdministrationSchema
 );
+
+export default Administration;

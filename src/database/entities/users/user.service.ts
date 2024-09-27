@@ -58,7 +58,7 @@ class UserService {
       .populate("roomId", "roomName");
 
     if (!access) {
-      throw new Error("User currently not checked in anywhere");
+      return { message: "You are currently not checked in anywhere" };
     }
 
     return {
@@ -76,7 +76,7 @@ class UserService {
       .populate("roomId", "roomName");
 
     if (!access) {
-      throw new Error("User currently not checked in anywhere");
+      return { message: "User is currently not checked in anywhere" };
     }
 
     return {
@@ -94,7 +94,7 @@ class UserService {
       .populate("roomId", "roomName");
 
     if (!accessHistory || accessHistory.length === 0) {
-      throw new Error("No access history found for user");
+      return { message: "No access history found for user" };
     }
 
     const result = accessHistory.map((access: any) => ({

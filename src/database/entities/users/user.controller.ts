@@ -73,6 +73,16 @@ class UserController {
       .json({ message: "User's current access retrieved", currentAccess });
   }
 
+  async getOwnCurrentAccess(req: AuthRequest, res: Response) {
+    const userId = req.user?.userId as string;
+
+    const ownCurrentAccess = await UserService.ownCurrentAccess(userId);
+
+    return res
+      .status(200)
+      .json({ message: "Your current access retrieved", ownCurrentAccess });
+  }
+
   async getUsersAccessHistory(req: AuthRequest, res: Response) {
     const userId = req.params.userId;
 

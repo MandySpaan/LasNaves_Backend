@@ -8,6 +8,11 @@ const router = Router();
 
 router.get("/profile/own", authToken, UserController.getOwnProfile);
 router.put("/profile/own", authToken, UserController.updateOwnProfile);
+router.get(
+  "/current-access/own",
+  authToken,
+  UserController.getOwnCurrentAccess
+);
 router.put(
   "/change-password",
   authToken,

@@ -52,6 +52,24 @@ class UserService {
     return await User.find().select("-password");
   }
 
+  async ownCurrentAccess(userId: string) {
+    const access = await Access.findOne({ userId: userId, status: "active" })
+      .populate("userId", "name surname")
+      .populate("roomId", "roomName");
+
+    if (!access) {
+      throw new Error("User currently not checked in anywhere");
+    }
+
+    return {
+      userName: `${(access.userId as any).name} ${
+        (access.userId as any).surname
+      }`,
+      roomName: (access.roomId as any).roomName,
+      entryDateTime: access.entryDateTime,
+    };
+  }
+
   async usersCurrentAccess(userId: string) {
     const access = await Access.findOne({ userId: userId, status: "active" })
       .populate("userId", "name surname")

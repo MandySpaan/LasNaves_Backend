@@ -50,6 +50,7 @@ class roomService {
 
   async getRoomOccupancy(roomId: string) {
     const room = await Room.findById(roomId);
+    const timeNow = new Date();
 
     if (!room) {
       throw new Error("Room not found");
@@ -57,13 +58,21 @@ class roomService {
 
     const currentOccupancy = await Access.countDocuments({
       roomId,
-      active: true,
+      status: "active",
     });
 
-    const placesAvailable = room.capacity - currentOccupancy;
+    const currentReserved = await Access.countDocuments({
+      roomId,
+      status: "reserved",
+      entryDateTime: { $lte: timeNow },
+      exitDateTime: { $gte: timeNow },
+    });
+
+    const placesAvailable = room.capacity - currentOccupancy - currentReserved;
 
     return {
       currentOccupancy,
+      currentReserved,
       placesAvailable,
     };
   }

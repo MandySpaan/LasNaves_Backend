@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import Access from "../entities/access/access.model";
 import User from "../entities/users/user.model";
 import Room from "../entities/rooms/room.model";
@@ -61,12 +60,17 @@ function getRandomDuration(): number {
 }
 
 export async function accessSeeder() {
-  const numberOfCurrentActive = 10;
-  const numberOfCurrentReserved = 2;
-  const numberOfFutureReserved = 120;
+  const numberOfCurrentActive = 15;
+  const numberOfCurrentReserved = 5;
+  const numberOfFutureReserved = 80;
 
   const users = await User.find({});
   const rooms = await Room.find({});
+
+  const roomCapacities = new Map();
+  rooms.forEach((room: any) => {
+    roomCapacities.set(room._id.toString(), room.capacity);
+  });
 
   const userIds = users.map((user) => user._id);
   const roomIds = rooms.map((room) => room._id);
@@ -76,25 +80,47 @@ export async function accessSeeder() {
   twoWeeksFromNow.setDate(currentDate.getDate() + 14);
 
   const validDates = getWeekdayDates(currentDate, twoWeeksFromNow);
-  const accessData = [];
+  const accessData: any = [];
+
+  const countCurrentOccupancy = (roomId: any) => {
+    return accessData.filter((access: any) => access.roomId.equals(roomId))
+      .length;
+  };
 
   // Seeds for current time with status 'active' (no exit time)
   for (let i = 0; i < numberOfCurrentActive; i++) {
-    const roomId = roomIds[Math.floor(Math.random() * roomIds.length)];
+    const roomId: any = roomIds[Math.floor(Math.random() * roomIds.length)];
     const userId = userIds[Math.floor(Math.random() * userIds.length)];
     const entryDateTime = getRandomPastDate();
 
-    accessData.push({
-      userId,
-      roomId,
-      entryDateTime,
-      status: "active",
-    });
+    const currentOccupancy = countCurrentOccupancy(roomId);
+    const totalCurrentOccupancy = currentOccupancy + 1;
+
+    if (totalCurrentOccupancy <= roomCapacities.get(roomId.toString())) {
+      accessData.push({
+        userId,
+        roomId,
+        entryDateTime,
+        status: "active",
+      });
+    }
   }
+
+  const now = new Date();
+
+  const countCurrentReservedOccupancy = (roomId: any) => {
+    return accessData.filter(
+      (access: any) =>
+        access.roomId.equals(roomId) &&
+        access.status === "reserved" &&
+        access.entryDateTime <= now &&
+        access.exitDateTime > now
+    ).length;
+  };
 
   // Seeds for current time with status 'reserved'
   for (let i = 0; i < numberOfCurrentReserved; i++) {
-    const roomId = roomIds[Math.floor(Math.random() * roomIds.length)];
+    const roomId: any = roomIds[Math.floor(Math.random() * roomIds.length)];
     const userId = userIds[Math.floor(Math.random() * userIds.length)];
     const entryDateTime = getRandomFullHour(9, 17, new Date());
     let exitDateTime = new Date(entryDateTime.getTime() + getRandomDuration());
@@ -107,18 +133,25 @@ export async function accessSeeder() {
       exitDateTime.setUTCHours(18, 0, 0, 0);
     }
 
-    accessData.push({
-      userId,
-      roomId,
-      entryDateTime,
-      exitDateTime,
-      status: "reserved",
-    });
+    const currentReservedOccupancy = countCurrentReservedOccupancy(roomId);
+    const totalCurrentReservedOccupancy = currentReservedOccupancy + 1;
+
+    if (
+      totalCurrentReservedOccupancy <= roomCapacities.get(roomId.toString())
+    ) {
+      accessData.push({
+        userId,
+        roomId,
+        entryDateTime,
+        exitDateTime,
+        status: "reserved",
+      });
+    }
   }
 
   // Seeds for future time with status 'reserved'
   for (let i = 0; i < numberOfFutureReserved; i++) {
-    const roomId = roomIds[Math.floor(Math.random() * roomIds.length)];
+    const roomId: any = roomIds[Math.floor(Math.random() * roomIds.length)];
     const userId = userIds[Math.floor(Math.random() * userIds.length)];
 
     const randomDate =
@@ -134,13 +167,18 @@ export async function accessSeeder() {
       exitDateTime.setUTCHours(18, 0, 0, 0);
     }
 
-    accessData.push({
-      userId,
-      roomId,
-      entryDateTime,
-      exitDateTime,
-      status: "reserved",
-    });
+    const currentOccupancy = countCurrentOccupancy(roomId);
+    const totalCurrentOccupancy = currentOccupancy + 1;
+
+    if (totalCurrentOccupancy <= roomCapacities.get(roomId.toString())) {
+      accessData.push({
+        userId,
+        roomId,
+        entryDateTime,
+        exitDateTime,
+        status: "reserved",
+      });
+    }
   }
 
   try {

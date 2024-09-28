@@ -40,53 +40,64 @@ class AccessService {
 
     const currentDateTime = new Date();
 
-    const existingAccess = await Access.findOne({
+    const activeAccess = await Access.findOne({
+      userId,
+      status: "active",
+    });
+
+    if (activeAccess) {
+      throw new Error(
+        `You are already checked in at roomId: ${activeAccess.roomId}`
+      );
+    }
+
+    const currentReservation = await Access.findOne({
       userId,
       roomId,
       entryDateTime: {
         $lte: currentDateTime,
       },
       exitDateTime: { $gte: currentDateTime },
+      status: "reserved",
     });
 
-    if (existingAccess) {
-      if (existingAccess.status === "active") {
-        throw new Error("User already checked in");
-      }
-      existingAccess.status = "active";
-      await existingAccess.save();
-      return existingAccess;
+    if (currentReservation) {
+      currentReservation.status = "active";
+      await currentReservation.save();
+      return currentReservation;
     }
 
-    const accessElsewhere = await Access.findOne({
+    const reservationElsewhere = await Access.findOne({
       userId,
       entryDateTime: {
         $lte: currentDateTime,
       },
       exitDateTime: { $gte: currentDateTime },
+      status: "reserved",
     });
 
-    if (accessElsewhere) {
-      if (accessElsewhere.status === "active") {
-        throw new Error(
-          `User already checked in at roomId: ${accessElsewhere.roomId}`
-        );
-      } else if (accessElsewhere.status === "reserved") {
-        throw new Error(
-          `User has a reservation at roomId: ${accessElsewhere.roomId}`
-        );
-      }
+    if (reservationElsewhere) {
+      throw new Error(
+        `You have a reservation at roomId: ${reservationElsewhere.roomId}`
+      );
     }
 
-    const currentOccupancy = await Access.countDocuments({
+    const currentRoomReservations = await Access.countDocuments({
       roomId,
       entryDateTime: {
         $lte: currentDateTime,
       },
       exitDateTime: { $gte: currentDateTime },
+      status: "reserved",
     });
 
-    const placesAvailable = room.capacity - currentOccupancy;
+    const currentRoomOccupancy = await Access.countDocuments({
+      roomId,
+      status: "active",
+    });
+
+    const placesAvailable =
+      room.capacity - currentRoomReservations - currentRoomOccupancy;
     if (placesAvailable <= 0) {
       throw new Error("Room is full");
     }

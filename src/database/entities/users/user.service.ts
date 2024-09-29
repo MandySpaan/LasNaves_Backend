@@ -66,6 +66,7 @@ class UserService {
         (access.userId as any).surname
       }`,
       roomName: (access.roomId as any).roomName,
+      roomId: (access.roomId as any)._id,
       entryDateTime: access.entryDateTime,
     };
   }

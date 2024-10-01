@@ -138,15 +138,14 @@ class AccessService {
   async reservePlace(
     userId: string,
     roomId: string,
-    rawEntryDateTime: Date,
-    rawExitDateTime: Date
+    entryDateTime: Date,
+    exitDateTime: Date
   ) {
-    const entryDateTime = new Date(rawEntryDateTime);
-    const exitDateTime = new Date(rawExitDateTime);
-
     if (isNaN(entryDateTime.getTime()) || isNaN(exitDateTime.getTime())) {
       throw new Error("Invalid date format");
     }
+
+    console.log(entryDateTime, typeof entryDateTime);
 
     if (entryDateTime > exitDateTime) {
       throw new Error("Entry date must be before exit date");

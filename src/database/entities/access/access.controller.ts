@@ -37,8 +37,8 @@ class AccessController {
   async makeReservation(req: AuthRequest, res: Response) {
     const userId = req.user?.userId as string;
     const roomId = req.params.roomId as string;
-    const entryDateTime = req.body.entryDateTime as Date;
-    const exitDateTime = req.body.exitDateTime as Date;
+    const entryDateTime = new Date(req.body.entryDateTime);
+    const exitDateTime = new Date(req.body.exitDateTime);
 
     const newReservation = await AccessService.reservePlace(
       userId,

@@ -61,7 +61,7 @@ function getRandomDuration(): number {
 
 export async function accessSeeder() {
   const numberOfCurrentActive = 15;
-  const numberOfCurrentReserved = 5;
+  const numberOfCurrentReserved = 3;
   const numberOfFutureReserved = 80;
 
   const users = await User.find({});
@@ -118,11 +118,13 @@ export async function accessSeeder() {
     ).length;
   };
 
+  const currentHour = new Date().getUTCHours();
+
   // Seeds for current time with status 'reserved'
   for (let i = 0; i < numberOfCurrentReserved; i++) {
     const roomId: any = roomIds[Math.floor(Math.random() * roomIds.length)];
     const userId = userIds[Math.floor(Math.random() * userIds.length)];
-    const entryDateTime = getRandomFullHour(9, 17, new Date());
+    const entryDateTime = getRandomFullHour(9, currentHour, new Date());
     let exitDateTime = new Date(entryDateTime.getTime() + getRandomDuration());
 
     if (
@@ -131,6 +133,10 @@ export async function accessSeeder() {
     ) {
       exitDateTime = new Date(entryDateTime);
       exitDateTime.setUTCHours(18, 0, 0, 0);
+    }
+
+    if (exitDateTime <= now) {
+      exitDateTime = new Date(now.getTime() + getRandomDuration());
     }
 
     const currentReservedOccupancy = countCurrentReservedOccupancy(roomId);

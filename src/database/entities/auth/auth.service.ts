@@ -115,7 +115,7 @@ class AuthService {
       if (!isPasswordValid) return null;
 
       const token = jwt.sign(
-        { userId: user._id, email: user.email },
+        { userId: user._id, role: user.role },
         JWT_SECRET,
         { expiresIn: "2h" }
       );

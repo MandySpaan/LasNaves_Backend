@@ -28,11 +28,5 @@ router.get(
   isAdmin,
   UserController.getUsersCurrentAccess
 );
-router.get(
-  "/:userId/access-history",
-  authToken,
-  isAdmin,
-  UserController.getUsersAccessHistory
-);
 
 export { router };

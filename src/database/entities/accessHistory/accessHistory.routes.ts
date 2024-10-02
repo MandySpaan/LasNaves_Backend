@@ -16,5 +16,11 @@ router.get(
   isAdmin,
   accessHistoryController.getRoomsAccessHistoriesByDate
 );
+router.get(
+  "/user/:userId/date",
+  authToken,
+  isAdmin,
+  accessHistoryController.getUsersAccessHistoryByDate
+);
 
 export { router };

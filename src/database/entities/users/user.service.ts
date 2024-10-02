@@ -111,25 +111,6 @@ class UserService {
       entryDateTime: access.entryDateTime,
     };
   }
-
-  async usersAccessHistory(userId: string) {
-    const accessHistory = await AccessHistory.find({ userId: userId })
-      .populate("userId", "name surname")
-      .populate("roomId", "roomName");
-
-    if (!accessHistory || accessHistory.length === 0) {
-      return { message: "No access history found for user" };
-    }
-
-    const result = accessHistory.map((access: any) => ({
-      userName: `${access.userId.name} ${access.userId.surname}`,
-      roomName: access.roomId.roomName,
-      status: access.status,
-      entryDateTime: access.entryDateTime,
-      exitDateTime: access.exitDateTime,
-    }));
-    return result;
-  }
 }
 
 export default new UserService();

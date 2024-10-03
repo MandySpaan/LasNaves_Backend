@@ -11,6 +11,20 @@ class AdministrationController {
     });
   }
 
+  async uploadReport(req: Request, res: Response) {
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No file uploaded" });
+    }
+    const filePath = await administrationService.uploadFile(req.file);
+    return res.status(200).json({
+      success: true,
+      message: "PDF uploaded successfully",
+      filePath,
+    });
+  }
+
   async getReportsByDate(req: Request, res: Response) {
     const startDate = req.query.startDate as string;
     const endDate = req.query.endDate as string;

@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
 import "express-async-errors";
 import "dotenv/config";
 import { dbConnection } from "./database/db";
@@ -10,7 +11,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-
 app.use(cors());
 
 app.get("/healthy", (req, res) => {
@@ -19,6 +19,8 @@ app.get("/healthy", (req, res) => {
     message: "Server is healthy",
   });
 });
+
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.use("/", router);
 

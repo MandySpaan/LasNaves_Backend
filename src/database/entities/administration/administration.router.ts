@@ -1,8 +1,11 @@
 import { Router } from "express";
+import multer from "multer";
 import AdministrationController from "./administration.controller";
 import { authToken, isAdmin } from "../../../middleware/auth.middleware";
 
 const router = Router();
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 export { router };
 
@@ -12,6 +15,15 @@ router.post(
   isAdmin,
   AdministrationController.createDailyReport
 );
+
+router.post(
+  "/upload-report",
+  authToken,
+  isAdmin,
+  upload.single("pdf"),
+  AdministrationController.uploadReport
+);
+
 router.get(
   "/get-reports",
   authToken,

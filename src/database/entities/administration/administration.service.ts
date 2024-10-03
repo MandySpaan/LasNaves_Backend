@@ -1,3 +1,6 @@
+import { promises as fs } from "fs";
+import path from "path";
+import { format } from "date-fns";
 import AccessHistory from "../accessHistory/accessHistory.model";
 import Room from "../rooms/room.model";
 import Administration, { IRoomUsage } from "./administration.model";
@@ -224,6 +227,27 @@ class AdministrationService {
     return {
       savedReport,
     };
+  }
+
+  async uploadFile(file: Express.Multer.File): Promise<string> {
+    try {
+      const uploadDir = path.resolve(__dirname, "../../../../uploads");
+
+      await fs.mkdir(uploadDir, { recursive: true });
+
+      const today = new Date();
+      const formattedDate = format(today, "yyyy-MM-dd");
+
+      const fileName = `${formattedDate}-daily-report.pdf`;
+
+      const filePath = path.join(uploadDir, fileName);
+
+      await fs.writeFile(filePath, file.buffer);
+
+      return `/uploads/${fileName}`;
+    } catch (error: any) {
+      throw new Error("Error saving file: " + error.message);
+    }
   }
 
   async getReportsByDate(startDate: string, endDate: string) {

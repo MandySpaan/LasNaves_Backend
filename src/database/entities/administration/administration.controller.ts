@@ -25,6 +25,14 @@ class AdministrationController {
     });
   }
 
+  async getReportsList(req: Request, res: Response) {
+    const reports = await administrationService.reportsList();
+    res.status(200).send({
+      message: "Report lost retrieved successfully",
+      reports,
+    });
+  }
+
   async getReportsByDate(req: Request, res: Response) {
     const startDate = req.query.startDate as string;
     const endDate = req.query.endDate as string;

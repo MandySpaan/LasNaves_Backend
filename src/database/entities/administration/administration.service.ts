@@ -250,6 +250,22 @@ class AdministrationService {
     }
   }
 
+  async reportsList() {
+    try {
+      const reportsDir = path.resolve(__dirname, "../../../../uploads");
+      const files = await fs.readdir(reportsDir);
+
+      const reports = files.map((file) => ({
+        filename: file,
+        _id: file,
+      }));
+
+      return reports;
+    } catch (error) {
+      throw new Error("Failed to retrieve reports.");
+    }
+  }
+
   async getReportsByDate(startDate: string, endDate: string) {
     if (!startDate || !endDate) {
       throw new Error("startDate and endDate query parameters are required");

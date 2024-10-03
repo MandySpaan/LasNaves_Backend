@@ -15,7 +15,6 @@ router.post(
   isAdmin,
   AdministrationController.createDailyReport
 );
-
 router.post(
   "/upload-report",
   authToken,
@@ -23,7 +22,12 @@ router.post(
   upload.single("pdf"),
   AdministrationController.uploadReport
 );
-
+router.get(
+  "/reports",
+  authToken,
+  isAdmin,
+  AdministrationController.getReportsList
+);
 router.get(
   "/get-reports",
   authToken,

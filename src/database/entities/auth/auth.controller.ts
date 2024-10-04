@@ -23,9 +23,8 @@ class AuthController {
     const { token, email } = req.query as { token: string; email: string };
     const decodedEmail = decodeURIComponent(email);
     const result = await AuthService.verifyEmail(decodedEmail, token);
-    res
-      .status(200)
-      .json({ message: "Email verified successfully. You can now log in." });
+    //ToDo: Change this to the real domain that is being used
+    return res.redirect(`http://localhost:5173/email-verified`);
   }
 
   async login(req: Request, res: Response) {

@@ -161,7 +161,6 @@ class AccessService {
 
     const existingReservation = await Access.findOne({
       userId,
-      roomId,
       entryDateTime: {
         $lt: exitDateTime,
       },
@@ -170,9 +169,7 @@ class AccessService {
     });
 
     if (existingReservation) {
-      throw new Error(
-        `User already has a reservation from ${existingReservation.entryDateTime} to ${existingReservation.exitDateTime}`
-      );
+      throw new Error(`You already have a reservation at that time`);
     }
 
     const occupancy = await Access.countDocuments({

@@ -83,6 +83,13 @@ class UserService {
       return { message: "You have no upcoming reservations" };
     }
 
+    myReservations.sort((a, b) => {
+      return (
+        new Date(a.entryDateTime).getTime() -
+        new Date(b.entryDateTime).getTime()
+      );
+    });
+
     const myReservationsData = await Promise.all(
       myReservations.map(async (reservation: any) => {
         const accessId = reservation._id;

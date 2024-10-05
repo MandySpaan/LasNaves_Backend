@@ -85,10 +85,11 @@ class UserService {
 
     const myReservationsData = await Promise.all(
       myReservations.map(async (reservation: any) => {
+        const accessId = reservation._id;
         const roomName = (reservation.roomId as any).roomName;
         const entryDateTime = reservation.entryDateTime;
         const exitDateTime = reservation.exitDateTime;
-        return { roomName, entryDateTime, exitDateTime };
+        return { accessId, roomName, entryDateTime, exitDateTime };
       })
     );
     return myReservationsData;

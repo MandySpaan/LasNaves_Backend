@@ -27,7 +27,7 @@ export async function sendVerificationEmail(email: string, token: string) {
 
 export async function sendPasswordResetEmail(email: string, token: string) {
   // ToDo: Change this to the real domain that is being used
-  const resetUrl = `http://localhost:4000/auth/reset-password?token=${token}&email=${encodeURIComponent(
+  const resetUrl = `http://localhost:5173/reset-password?token=${token}&email=${encodeURIComponent(
     email
   )};`;
 

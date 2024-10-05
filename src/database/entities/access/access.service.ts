@@ -145,8 +145,6 @@ class AccessService {
       throw new Error("Invalid date format");
     }
 
-    console.log(entryDateTime, typeof entryDateTime);
-
     if (entryDateTime > exitDateTime) {
       throw new Error("Entry date must be before exit date");
     }

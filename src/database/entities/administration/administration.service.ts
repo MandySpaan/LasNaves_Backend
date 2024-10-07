@@ -4,12 +4,15 @@ import { format } from "date-fns";
 import AccessHistory from "../accessHistory/accessHistory.model";
 import Room from "../rooms/room.model";
 import Administration, { IRoomUsage } from "./administration.model";
-import { getReportDate, getYesterdayDateRange } from "./administration.utils";
+import {
+  getLastWorkdayDateRange,
+  getDailyReportDate,
+} from "./administration.utils";
 
 class AdministrationService {
   async createDailyReport() {
-    const { start, end } = getYesterdayDateRange();
-    const reportDate = getReportDate();
+    const { start, end } = getLastWorkdayDateRange();
+    const reportDate = getDailyReportDate();
 
     const totalAccesses = await AccessHistory.countDocuments({
       $or: [{ status: "completed" }, { status: "completed (no check-out)" }],

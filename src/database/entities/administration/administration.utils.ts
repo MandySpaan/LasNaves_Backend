@@ -1,6 +1,17 @@
-export const getReportDate = (): Date => {
+export const getDailyReportDate = (): Date => {
   const today = new Date();
-  today.setDate(today.getDate() - 1);
+  const dayOfWeek = today.getDay();
+
+  let daysToSubtract;
+  if (dayOfWeek === 0) {
+    daysToSubtract = 2;
+  } else if (dayOfWeek === 1) {
+    daysToSubtract = 3;
+  } else {
+    daysToSubtract = 1;
+  }
+
+  today.setDate(today.getDate() - daysToSubtract);
 
   const reportDate = new Date(
     today.getFullYear(),
@@ -11,11 +22,21 @@ export const getReportDate = (): Date => {
   return reportDate;
 };
 
-export const getYesterdayDateRange = (): { start: Date; end: Date } => {
+export const getLastWorkdayDateRange = (): { start: Date; end: Date } => {
   const now = new Date();
+  const dayOfWeek = now.getDay();
+
+  let daysToSubtract;
+  if (dayOfWeek === 0) {
+    daysToSubtract = 2;
+  } else if (dayOfWeek === 1) {
+    daysToSubtract = 3;
+  } else {
+    daysToSubtract = 1;
+  }
 
   const start = new Date(now);
-  start.setDate(now.getDate() - 1);
+  start.setDate(now.getDate() - daysToSubtract);
   start.setHours(0, 0, 0, 0);
 
   const end = new Date(start);

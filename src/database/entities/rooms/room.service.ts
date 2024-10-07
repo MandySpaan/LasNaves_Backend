@@ -59,6 +59,11 @@ class roomService {
     const currentOccupancy = await Access.countDocuments({
       roomId,
       status: "active",
+      entryDateTime: { $lte: timeNow },
+      $or: [
+        { exitDateTime: { $gte: new Date() } },
+        { exitDateTime: { $exists: false } },
+      ],
     });
 
     const currentReserved = await Access.countDocuments({
@@ -78,7 +83,14 @@ class roomService {
   }
 
   async roomCurrentStatus(roomId: string) {
-    const access = await Access.find({ roomId: roomId })
+    const access = await Access.find({
+      roomId: roomId,
+      entryDateTime: { $lte: new Date() },
+      $or: [
+        { exitDateTime: { $gte: new Date() } },
+        { exitDateTime: { $exists: false } },
+      ],
+    })
       .populate("userId", "name surname")
       .populate("roomId", "roomName");
 

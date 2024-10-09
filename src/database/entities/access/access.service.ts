@@ -43,11 +43,15 @@ class AccessService {
     const activeAccess = await Access.findOne({
       userId,
       status: "active",
+    }).populate({
+      path: "roomId",
+      select: "roomName",
     });
 
     if (activeAccess) {
+      const roomId = (activeAccess as any).roomId;
       throw new Error(
-        `You are already checked in at roomId: ${activeAccess.roomId}`
+        `You are already checked in at the room: ${roomId.roomName}`
       );
     }
 
@@ -74,11 +78,15 @@ class AccessService {
       },
       exitDateTime: { $gte: currentDateTime },
       status: "reserved",
+    }).populate({
+      path: "roomId",
+      select: "roomName",
     });
 
     if (reservationElsewhere) {
+      const roomId = (reservationElsewhere as any).roomId;
       throw new Error(
-        `You have a reservation at roomId: ${reservationElsewhere.roomId}`
+        `You have a pending reservation for the room: ${roomId.roomName}`
       );
     }
 
@@ -99,7 +107,7 @@ class AccessService {
     const placesAvailable =
       room.capacity - currentRoomReservations - currentRoomOccupancy;
     if (placesAvailable <= 0) {
-      throw new Error("Room is full");
+      throw new Error("Sorry, this room is full");
     }
 
     const newAccess = new Access({
@@ -146,12 +154,12 @@ class AccessService {
     }
 
     if (entryDateTime > exitDateTime) {
-      throw new Error("Entry date must be before exit date");
+      throw new Error("The entry time must be before the exit time");
     }
 
     const now = new Date();
     if (entryDateTime < now || exitDateTime < now) {
-      throw new Error("Entry and exit date must be in the future");
+      throw new Error("The entry date cannot be in the past");
     }
 
     const room = await Room.findById(roomId);
@@ -181,7 +189,7 @@ class AccessService {
     const placesAvailable = room.capacity - occupancy;
 
     if (placesAvailable <= 0) {
-      throw new Error("No places available");
+      throw new Error("Sorry, this room is full at that time");
     }
 
     const session = await mongoose.startSession();
@@ -219,7 +227,7 @@ class AccessService {
 
     if (access.status === "active") {
       throw new Error(
-        "User already checked in, cannot cancel: please check out"
+        "You are already checked in, please check out instead of cancelling"
       );
     }
 

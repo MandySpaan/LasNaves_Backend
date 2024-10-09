@@ -21,7 +21,9 @@ export function authToken(req: AuthRequest, res: Response, next: NextFunction) {
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
       if (err.name === "TokenExpiredError") {
-        return res.status(403).send({ message: "Token expired" });
+        return res
+          .status(403)
+          .send({ message: "Your session has expired, please login again" });
       }
       return res.status(403).send({ message: "Invalid token" });
     }

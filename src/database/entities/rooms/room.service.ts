@@ -95,7 +95,7 @@ class roomService {
       .populate("roomId", "roomName");
 
     if (!access || access.length === 0) {
-      throw new Error("Room has no current check-ins nor reservations");
+      return { message: "Room has no current check-ins nor reservations" };
     }
 
     const result = access.map((access: any) => ({

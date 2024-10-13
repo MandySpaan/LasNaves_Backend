@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import AccessHistory from "../entities/accessHistory/accessHistory.model";
 import User from "../entities/users/user.model";
 import Room from "../entities/rooms/room.model";

@@ -1,6 +1,4 @@
-import { access } from "fs";
 import Access from "../access/access.model";
-import AccessHistory from "../accessHistory/accessHistory.model";
 import User from "./user.model";
 import bcrypt from "bcrypt";
 
